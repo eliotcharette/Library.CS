@@ -114,8 +114,8 @@ namespace Library.Models
             conn.Open();
             MySqlCommand cmd = conn.CreateCommand() as MySqlCommand;
             cmd.CommandText = @"SELECT authors.* FROM books
-                JOIN books_authors ON (books.id = books_authors.book_id)
-                JOIN authors ON (books_authors.author_id = authors.id)
+                JOIN authors_books ON (books.id = authors_books.book_id)
+                JOIN authors ON (authors_books.author_id = authors.id)
                 WHERE books.id = @BookId;";
 
             MySqlParameter bookIdParameter = new MySqlParameter();
@@ -145,7 +145,7 @@ namespace Library.Models
             MySqlConnection conn = DB.Connection();
             conn.Open();
             var cmd = conn.CreateCommand() as MySqlCommand;
-            cmd.CommandText = @"INSERT INTO books_authors (book_id, author_id) VALUES (@BookId, @AuthorId);";
+            cmd.CommandText = @"INSERT INTO authors_books (book_id, author_id) VALUES (@BookId, @AuthorId);";
 
             MySqlParameter book_id = new MySqlParameter();
             book_id.ParameterName = "@BookId";
@@ -195,6 +195,34 @@ namespace Library.Models
       {
         conn.Dispose();
       }
+    }
+    public static List<Book> SearchStart(string start)
+    {
+      List<Book> bookSearch = new List<Book> {};
+      MySqlConnection conn = DB.Connection();
+      conn.Open();
+
+      var cmd = conn.CreateCommand() as MySqlCommand;
+      cmd.CommandText =@"SELECT * FROM books WHERE book LIKE @Title;";
+      MySqlParameter searchTitle = new MySqlParameter();
+      searchTitle.ParameterName = "@Title";
+      searchTitle.Value = start + "%";
+      cmd.Parameters.Add(searchTitle);
+
+      var rdr = cmd.ExecuteReader() as MySqlDataReader;
+      while(rdr.Read())
+      {
+        int BookId = rdr.GetInt32(0);
+        string Book = rdr.GetString(1);
+        Book newBook = new Book(Book, BookId);
+        bookSearch.Add(newBook);
+      }
+      conn.Close();
+      if (conn != null)
+      {
+        conn.Dispose();
+      }
+      return bookSearch;
     }
 
 

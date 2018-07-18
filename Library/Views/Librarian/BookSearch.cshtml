@@ -1,0 +1,19 @@
+<h1>Search for books</h1>
+<hr />
+<form  action="/booksearch" method="post">
+  <label for="start">Book starts with:</label>
+  <input type="text" name="start" required>
+  <button type="submit" name="button">Search</button>
+</form>
+
+
+@if (Model.Count != 0)
+{
+  <ul>
+    @foreach (var book in Model)
+    {
+      <li>@book.GetBook()</li>
+    }
+  </ul>
+}
+<h4><a href="/">Return home</a></h4>

@@ -56,9 +56,33 @@ namespace Library.Models
         conn.Dispose();
       }
     }
-    public static List<Author> Search()
+    public static List<Author> SearchStart(string start)
     {
-      
+      List<Author> authorSearch = new List<Author> {};
+      MySqlConnection conn = DB.Connection();
+      conn.Open();
+
+      var cmd = conn.CreateCommand() as MySqlCommand;
+      cmd.CommandText = @"SELECT * FROM authors WHERE author LIKE @Name;";
+      MySqlParameter searchName = new MySqlParameter();
+      searchName.ParameterName = "@Name";
+      searchName.Value = start + "%";
+      cmd.Parameters.Add(searchName);
+
+      var rdr = cmd.ExecuteReader() as MySqlDataReader;
+      while(rdr.Read())
+      {
+        int AuthorId = rdr.GetInt32(0);
+        string Author = rdr.GetString(1);
+        Author newAuthor = new Author(Author, AuthorId);
+        authorSearch.Add(newAuthor);
+      }
+      conn.Close();
+      if (conn != null)
+      {
+        conn.Dispose();
+      }
+      return authorSearch;
     }
     public static List<Author> GetAll()
     {
@@ -113,68 +137,68 @@ namespace Library.Models
     }
 
     public List<Book> GetBooks()
-        {
-            MySqlConnection conn = DB.Connection();
-            conn.Open();
-            MySqlCommand cmd = conn.CreateCommand() as MySqlCommand;
-            cmd.CommandText = @"SELECT books.* FROM authors
-                JOIN authors_books ON (authors.id = authors_books.author_id)
-                JOIN books ON (authors_books.book_id = books.id)
-                WHERE authors.id = @AuthorId;";
+    {
+      MySqlConnection conn = DB.Connection();
+      conn.Open();
+      MySqlCommand cmd = conn.CreateCommand() as MySqlCommand;
+      cmd.CommandText = @"SELECT books.* FROM authors
+      JOIN authors_books ON (authors.id = authors_books.author_id)
+      JOIN books ON (authors_books.book_id = books.id)
+      WHERE authors.id = @AuthorId;";
 
-            MySqlParameter authorIdParameter = new MySqlParameter();
-            authorIdParameter.ParameterName = "@AuthorId";
-            authorIdParameter.Value = _id;
-            cmd.Parameters.Add(authorIdParameter);
+      MySqlParameter authorIdParameter = new MySqlParameter();
+      authorIdParameter.ParameterName = "@AuthorId";
+      authorIdParameter.Value = _id;
+      cmd.Parameters.Add(authorIdParameter);
 
-            MySqlDataReader rdr = cmd.ExecuteReader() as MySqlDataReader;
-            List<Book> books = new List<Book>{};
+      MySqlDataReader rdr = cmd.ExecuteReader() as MySqlDataReader;
+      List<Book> books = new List<Book>{};
 
-            while(rdr.Read())
-            {
-              int BookId = rdr.GetInt32(0);
-              string BookTitle = rdr.GetString(1);
-              Book newBook = new Book(BookTitle);
-              books.Add(newBook);
-            }
-            conn.Close();
-            if (conn != null)
-            {
-                conn.Dispose();
-            }
-            return books;
-        }
+      while(rdr.Read())
+      {
+        int BookId = rdr.GetInt32(0);
+        string BookTitle = rdr.GetString(1);
+        Book newBook = new Book(BookTitle);
+        books.Add(newBook);
+      }
+      conn.Close();
+      if (conn != null)
+      {
+        conn.Dispose();
+      }
+      return books;
+    }
     public void AddBook(Book newBook)
-        {
-            MySqlConnection conn = DB.Connection();
-            conn.Open();
-            var cmd = conn.CreateCommand() as MySqlCommand;
-            cmd.CommandText = @"INSERT INTO authors_books (author_id, book_id) VALUES (@AuthorId, @BookId);";
+    {
+      MySqlConnection conn = DB.Connection();
+      conn.Open();
+      var cmd = conn.CreateCommand() as MySqlCommand;
+      cmd.CommandText = @"INSERT INTO authors_books (author_id, book_id) VALUES (@AuthorId, @BookId);";
 
-            MySqlParameter author_id = new MySqlParameter();
-            author_id.ParameterName = "@AuthorId";
-            author_id.Value = _id;
-            cmd.Parameters.Add(author_id);
+      MySqlParameter author_id = new MySqlParameter();
+      author_id.ParameterName = "@AuthorId";
+      author_id.Value = _id;
+      cmd.Parameters.Add(author_id);
 
-            MySqlParameter book_id = new MySqlParameter();
-            book_id.ParameterName = "@BookId";
-            book_id.Value = newBook.GetId();
-            cmd.Parameters.Add(book_id);
+      MySqlParameter book_id = new MySqlParameter();
+      book_id.ParameterName = "@BookId";
+      book_id.Value = newBook.GetId();
+      cmd.Parameters.Add(book_id);
 
-            cmd.ExecuteNonQuery();
-            conn.Close();
-            if (conn != null)
-            {
-                conn.Dispose();
-            }
-        }
+      cmd.ExecuteNonQuery();
+      conn.Close();
+      if (conn != null)
+      {
+        conn.Dispose();
+      }
+    }
 
     public void Delete()
     {
       MySqlConnection conn = DB.Connection();
       conn.Open();
 
-      MySqlCommand cmd = new MySqlCommand("DELETE FROM authors WHERE id = @AuthorId; DELETE FROM authors_items WHERE author_id = @AuthorId;", conn);
+      MySqlCommand cmd = new MySqlCommand("DELETE FROM authors WHERE id = @AuthorId; DELETE FROM authors_books WHERE author_id = @AuthorId;", conn);
       MySqlParameter authorIdParameter = new MySqlParameter();
       authorIdParameter.ParameterName = "@AuthorId";
       authorIdParameter.Value = this.GetId();
@@ -200,6 +224,6 @@ namespace Library.Models
       {
         conn.Dispose();
       }
+    }
   }
-}
 }

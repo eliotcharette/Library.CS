@@ -10,7 +10,7 @@
   <ul>
     @foreach (var book in Model)
     {
-      <li><a href='/flights/@book.GetId()'>@book.GetBook()</a> | <a href="/catalog" class="deleteAction" id="@book.GetId()">Delete</a></li>
+      <li><a href='/books/@book.GetId()'>@book.GetBook()</a> | <a href="/catalog" class="deleteAction" id="@book.GetId()">Delete</a></li>
     }
   </ul>
 }
