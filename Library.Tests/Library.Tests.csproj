@@ -7,9 +7,10 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
     <PackageReference Include="MSTest.TestAdapter" Version="1.2" />
     <PackageReference Include="MSTest.TestFramework" Version="1.2" />
+    <PackageReference Include="MySqlConnector" Version="0.42.3" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Library\Library.csproj" />
+    <ProjectReference Include="..\Airline\Airline.csproj" />
   </ItemGroup>
 </Project>
