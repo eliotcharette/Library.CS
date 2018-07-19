@@ -22,20 +22,20 @@ public ActionResult Checkout(int id)
     {
       Dictionary<string, object> model = new Dictionary<string, object>();
       Member newMember = Member.Find(id);
-      List<Book> books = Book.GetAll();
+      List<Book> books = newMember.GetBooks();
       List<Book> allBooks = Book.GetAll();
       model.Add("newMember", newMember);
       model.Add("books", books);
       model.Add("allBooks", allBooks);
       return View(model);
     }
-    [HttpPost("/checkout/{Id}/book")]
-    public ActionResult CheckoutBook(int newBookId)
+    [HttpPost("/checkout/{memberId}/book")]
+    public ActionResult CheckoutBook(int memberId)
     {
-      Member member = Member.Find(newBookId);
+      Member member = Member.Find(memberId);
       Book book = Book.Find(int.Parse(Request.Form["book-id"]));
       book.AddMember(member);
-      return RedirectToAction("Checkout", new { id = newBookId});
+      return RedirectToAction("Checkout", new { id = memberId});
     }
     [HttpGet("/member/form")]
     public ActionResult CreateMember()

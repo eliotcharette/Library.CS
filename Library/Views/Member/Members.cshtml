@@ -5,7 +5,7 @@
   <ul>
     @foreach (var member in Model)
     {
-      <li><a href='/checkout/@m.GetId()'>@m.GetMember()</a></li>
+      <li><a href='/checkout/@member.GetId()'>@member.GetMember()</a></li>
     }
   </ul>
 }
