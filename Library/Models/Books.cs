@@ -164,6 +164,30 @@ namespace Library.Models
                 conn.Dispose();
             }
         }
+        public void AddMember(Member newMember)
+            {
+                MySqlConnection conn = DB.Connection();
+                conn.Open();
+                var cmd = conn.CreateCommand() as MySqlCommand;
+                cmd.CommandText = @"INSERT INTO members_books (book_id, member_id) VALUES (@BookId, @MemberId);";
+
+                MySqlParameter book_id = new MySqlParameter();
+                book_id.ParameterName = "@BookId";
+                book_id.Value = _id;
+                cmd.Parameters.Add(book_id);
+
+                MySqlParameter member_id = new MySqlParameter();
+                member_id.ParameterName = "@MemberId";
+                member_id.Value = newMember.GetId();
+                cmd.Parameters.Add(member_id);
+
+                cmd.ExecuteNonQuery();
+                conn.Close();
+                if (conn != null)
+                {
+                    conn.Dispose();
+                }
+            }
     public void Delete()
     {
       MySqlConnection conn = DB.Connection();

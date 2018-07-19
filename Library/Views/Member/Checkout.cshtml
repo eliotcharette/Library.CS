@@ -1,0 +1,27 @@
+@using Library.Models;
+
+<h1>Checkout this book</h1>
+<h2>Member name: @Model["newMember"].GetMember()</h2>
+<hr />
+@if (@Model["books"].Count != 0)
+{
+  <h4>Here is your checkout list:</h4>
+  <ul>
+    @foreach (var book in @Model["books"])
+    {
+      <li>@book.GetBook()</li>
+    }
+  </ul>
+}
+<h4>Add a book to your checkout list:</h4>
+<form action='/checkout/@Model["newMember"].GetId()/book' method='post'>
+  <label for='book-id'>Select a book:</label>
+  <select id='book-id' name='book-id' type='text'>
+    @foreach (var book in @Model["allBooks"])
+    {
+      <option value='@book.GetId()'>@book.GetBook()</option>
+    }
+  </select>
+  <button type='submit'>Checkout</button>
+</form>
+<p><a href="/">Return to Main Page</a></p>
